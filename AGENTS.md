@@ -1,4 +1,4 @@
-# Analysis Context - Experiment 5 (Omar)
+# Analysis Context - Experiment 5 (Richard)
 
 ## Project Overview
 - **Project**: Differential gene expression analysis of epidermal organoids
