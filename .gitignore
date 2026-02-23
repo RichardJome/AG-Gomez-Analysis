@@ -1,0 +1,24 @@
+# R files
+*.Rproj
+*.Rhistory
+.RData
+.Ruserdata
+
+# Large data files
+*.xlsx
+*.xls
+*.rds
+
+# Plots and outputs
+*.png
+*.pdf
+results/
+rds/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.log
+*~
