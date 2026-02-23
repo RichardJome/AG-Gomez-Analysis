@@ -12,8 +12,14 @@
 # Plots and outputs
 *.png
 *.pdf
-results/
 rds/
+results/
+
+# Group analysis folders
+gf_24h/
+gf_6h/
+spf_24h/
+spf_6h/
 
 # OS files
 .DS_Store
