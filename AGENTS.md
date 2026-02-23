@@ -5,6 +5,55 @@
 - **Organism**: Mouse (Mus musculus)
 - **Tissue**: Epidermal organoids
 
+## R Dependencies
+
+All packages available via Bioconductor or CRAN:
+
+```r
+# Core analysis
+install.packages("BiocManager")
+BiocManager::install("DESeq2")
+
+# Data manipulation
+install.packages(c("dplyr", "tidyr", "readxl"))
+
+# Visualization
+install.packages(c("ggplot2", "ggVennDiagram"))
+BiocManager::install("EnhancedVolcano")
+```
+
+### Package List
+| Package | Purpose |
+|---------|---------|
+| DESeq2 | Differential expression analysis |
+| dplyr | Data manipulation |
+| tidyr | Data tidying |
+| readxl | Read Excel files |
+| ggplot2 | Base plotting |
+| ggVennDiagram | Venn diagrams |
+| EnhancedVolcano | Volcano plots |
+
+## How to Run
+
+```bash
+# 1. Run differential expression analysis
+Rscript 01_de_analysis.R
+
+# 2. Create Venn diagrams
+Rscript 02_venn_diagram.R
+
+# 3. Generate volcano plots
+Rscript 03_volcano_plots.R
+```
+
+Outputs are saved to respective group folders (gf_24h/, gf_6h/, spf_24h/, spf_6h/).
+
+## What NOT to Modify
+
+- Do not change sample column names in 01_de_analysis.R without updating sample mapping
+- Do not commit large data files (.xlsx, .rds, .png) - they are gitignored
+- Do not modify DESeq2 design formula without re-running all analyses
+
 ## Experiment Design
 
 ### Mice
@@ -85,11 +134,10 @@ personal webpage/
 - Suggests skin is actively responding to bacterial colonization
 
 ## Scripts Status
-- [x] 01_de_analysis.R - Modified for all 4 groups
-- [x] 02_venn_diagram.R - Modified for all 4 groups
-- [x] 03_volcano_plots.R - Modified for all 4 groups
-- [x] analysis_readme.txt - Updated
-- [ ] Run scripts - PENDING
+- [x] 01_de_analysis.R - Runs DE analysis for all 4 groups
+- [x] 02_venn_diagram.R - Creates Venn diagrams for all 4 groups
+- [x] 03_volcano_plots.R - Generates volcano plots for all 4 groups
+- [x] AGENTS.md - Updated with instructions and dependencies
 
 ## Notes for Omar
 - Volcano plot interpretation: LEFT = higher in Untreated, RIGHT = higher in treatment
