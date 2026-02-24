@@ -1,5 +1,44 @@
 # Analysis Context - Experiment 5 (Richard)
 
+## OpenCode Workflow
+- Use **Tab** to switch to **Plan agent** for read-only analysis before making changes
+- Use **@explore** for fast codebase searching - faster than manual grep
+- Use **@general** for parallel multi-step tasks
+- After code changes, run lint/typecheck if available
+
+## Tool Usage
+- **Bash**: Run Rscript commands (`Rscript 01_de_analysis.R`)
+- **Read/Edit**: File operations
+- **grep/glob**: Finding files and code patterns
+
+## Project Structure
+```
+D:\AG Gomez Analysis/
+├── 01_de_analysis.R        # Main DE analysis script
+├── 02_venn_diagram.R       # Venn diagram generator
+├── 03_volcano_plots.R     # Volcano plot generator
+├── AGENTS.md               # This file
+├── analysis_readme.txt     # Analysis documentation
+├── personal webpage/       # Output directory
+│   ├── gf_24h/rds/        # GF 24h DESeq2 results
+│   ├── gf_24h/results/    # Plots for GF 24h
+│   ├── gf_6h/rds/
+│   ├── gf_6h/results/
+│   ├── spf_24h/rds/
+│   ├── spf_24h/results/
+│   ├── spf_6h/rds/
+│   └── spf_6h/results/
+└── data/                   # Input data (gitignored)
+```
+
+## R Code Standards
+- Use `<-` for assignment (not `=`)
+- Comment with `#` for section headers
+- Variable names: lowercase with underscores (e.g., `result_df`)
+- Function names: lowercase with underscores (e.g., `read_count_data`)
+- Load packages explicitly with `library()` at script top
+- Use tidyverse style for dplyr operations
+
 ## Project Overview
 - **Project**: Differential gene expression analysis of epidermal organoids
 - **Organism**: Mouse (Mus musculus)
@@ -10,24 +49,14 @@
 All packages available via Bioconductor or CRAN:
 
 ```r
-# Core analysis
-install.packages("BiocManager")
-BiocManager::install("DESeq2")
-
-# Data manipulation
-install.packages(c("dplyr", "tidyr", "readxl"))
-
-# Visualization
-install.packages(c("ggplot2", "ggVennDiagram"))
-BiocManager::install("EnhancedVolcano")
+install.packages(c("BiocManager", "dplyr", "tidyr", "readxl", "ggplot2", "ggVennDiagram"))
+BiocManager::install(c("DESeq2", "EnhancedVolcano"))
 ```
 
-### Package List
 | Package | Purpose |
 |---------|---------|
 | DESeq2 | Differential expression analysis |
-| dplyr | Data manipulation |
-| tidyr | Data tidying |
+| dplyr, tidyr | Data manipulation |
 | readxl | Read Excel files |
 | ggplot2 | Base plotting |
 | ggVennDiagram | Venn diagrams |
@@ -109,13 +138,9 @@ personal webpage/
 ├── spf_24h/
 │   ├── rds/
 │   └── results/
-├── spf_6h/
-│   ├── rds/
-│   └── results/
-├── 01_de_analysis.R
-├── 02_venn_diagram.R
-├── 03_volcano_plots.R
-└── analysis_readme.txt
+└── spf_6h/
+    ├── rds/
+    └── results/
 ```
 
 ## Key Biological Findings (from initial GF 24h analysis)

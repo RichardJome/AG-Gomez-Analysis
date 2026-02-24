@@ -43,6 +43,16 @@ run_de_analysis <- function(group_name, sample_cols, output_dir) {
   saveRDS(res_U_vs_C, file.path(output_dir, "rds", "res_Untreated_vs_SG1C.rds"))
   saveRDS(res_B_vs_C, file.path(output_dir, "rds", "res_SG1B_vs_SG1C.rds"))
   
+  saveRDS(dds, file.path(output_dir, "rds", "dds_object.rds"))
+  
+  vst_counts <- assay(vst(dds, blind = TRUE))
+  vst_df <- as.data.frame(vst_counts)
+  vst_df$gene_id <- rownames(vst_counts)
+  vst_df$gene_name <- counts$gene_name[match(vst_df$gene_id, counts$gene_id)]
+  saveRDS(vst_df, file.path(output_dir, "rds", "vst_counts.rds"))
+  
+  cat(sprintf("VST counts saved for heatmap generation\n"))
+  
   sig1 <- subset(as.data.frame(res_U_vs_B), padj < 0.05 & abs(log2FoldChange) > 1)
   sig2 <- subset(as.data.frame(res_U_vs_C), padj < 0.05 & abs(log2FoldChange) > 1)
   sig3 <- subset(as.data.frame(res_B_vs_C), padj < 0.05 & abs(log2FoldChange) > 1)
