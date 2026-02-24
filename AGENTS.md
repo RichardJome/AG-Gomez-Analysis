@@ -16,18 +16,17 @@
 D:\AG Gomez Analysis/
 ├── 01_de_analysis.R        # Main DE analysis script
 ├── 02_venn_diagram.R       # Venn diagram generator
-├── 03_volcano_plots.R     # Volcano plot generator
-├── AGENTS.md               # This file
-├── analysis_readme.txt     # Analysis documentation
-├── personal webpage/       # Output directory
-│   ├── gf_24h/rds/        # GF 24h DESeq2 results
-│   ├── gf_24h/results/    # Plots for GF 24h
-│   ├── gf_6h/rds/
-│   ├── gf_6h/results/
-│   ├── spf_24h/rds/
-│   ├── spf_24h/results/
-│   ├── spf_6h/rds/
-│   └── spf_6h/results/
+├── 03_volcano_plots.R       # Volcano plot generator
+├── 04_heatmap.R            # Heatmap generator
+├── AGENTS.md                # This file
+├── analysis_readme.txt      # Analysis documentation
+├── heatmaps/               # Heatmap output directory
+├── gf_24h/                 # GF 24h analysis results
+│   ├── rds/                # DESeq2 results and VST counts
+│   └── results/            # Plots
+├── gf_6h/
+├── spf_24h/
+├── spf_6h/
 └── data/                   # Input data (gitignored)
 ```
 
@@ -162,7 +161,30 @@ personal webpage/
 - [x] 01_de_analysis.R - Runs DE analysis for all 4 groups
 - [x] 02_venn_diagram.R - Creates Venn diagrams for all 4 groups
 - [x] 03_volcano_plots.R - Generates volcano plots for all 4 groups
-- [x] AGENTS.md - Updated with instructions and dependencies
+- [x] 04_heatmap.R - Generates clustered heatmaps comparing all groups
+
+## Running Scripts
+
+```bash
+# 1. Run differential expression analysis
+Rscript 01_de_analysis.R
+
+# 2. Create Venn diagrams
+Rscript 02_venn_diagram.R
+
+# 3. Generate volcano plots
+Rscript 03_volcano_plots.R
+
+# 4. Generate heatmaps
+Rscript 04_heatmap.R
+```
+
+## Heatmap Output
+- Output directory: `heatmaps/`
+- Uses VST-normalized counts from each group
+- Compares significant genes across all groups (GF 24h, GF 6h, SPF 24h, SPF 6h)
+- Z-score row scaling for relative expression visualization
+- Dendrograms on both rows and columns for clustering
 
 ## Notes for Omar
 - Volcano plot interpretation: LEFT = higher in Untreated, RIGHT = higher in treatment
