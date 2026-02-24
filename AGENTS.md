@@ -17,13 +17,12 @@ D:\AG Gomez Analysis/
 ├── 01_de_analysis.R        # Main DE analysis script
 ├── 02_venn_diagram.R       # Venn diagram generator
 ├── 03_volcano_plots.R       # Volcano plot generator
-├── 04_heatmap.R            # Heatmap generator
+├── 04_heatmap.R            # Heatmap generator (genes across all groups)
+├── 05_pathway_analysis.R   # Pathway enrichment analysis (clusterProfiler)
 ├── AGENTS.md                # This file
-├── analysis_readme.txt      # Analysis documentation
-├── heatmaps/               # Heatmap output directory
 ├── gf_24h/                 # GF 24h analysis results
 │   ├── rds/                # DESeq2 results and VST counts
-│   └── results/            # Plots
+│   └── results/            # Plots (venn, volcano, heatmap)
 ├── gf_6h/
 ├── spf_24h/
 ├── spf_6h/
@@ -127,19 +126,23 @@ For each group, three DESeq2 contrasts:
 
 ## Output Structure
 ```
-personal webpage/
-├── gf_24h/
-│   ├── rds/ (3 RDS files)
-│   └── results/ (1 venn + 3 volcano plots)
-├── gf_6h/
-│   ├── rds/
-│   └── results/
-├── spf_24h/
-│   ├── rds/
-│   └── results/
-└── spf_6h/
-    ├── rds/
-    └── results/
+gf_24h/
+├── rds/
+│   ├── dds_object.rds
+│   ├── vst_counts.rds
+│   ├── res_Untreated_vs_SG1B.rds
+│   ├── res_Untreated_vs_SG1C.rds
+│   └── res_SG1B_vs_SG1C.rds
+└── results/
+    ├── venn_diagram.png
+    ├── volcano_Untreated_vs_SG1B.png
+    ├── volcano_Untreated_vs_SG1C.png
+    ├── volcano_SG1B_vs_SG1C.png
+    └── heatmap_*.png (varies by available genes)
+
+gf_6h/   (same structure)
+spf_24h/ (same structure)
+spf_6h/  (same structure)
 ```
 
 ## Key Biological Findings (from initial GF 24h analysis)
@@ -162,8 +165,9 @@ personal webpage/
 - [x] 02_venn_diagram.R - Creates Venn diagrams for all 4 groups
 - [x] 03_volcano_plots.R - Generates volcano plots for all 4 groups
 - [x] 04_heatmap.R - Generates clustered heatmaps comparing all groups
+- [ ] 05_pathway_analysis.R - Pathway enrichment (GO/KEGG)
 
-## Running Scripts
+## How to Run
 
 ```bash
 # 1. Run differential expression analysis
@@ -177,12 +181,15 @@ Rscript 03_volcano_plots.R
 
 # 4. Generate heatmaps
 Rscript 04_heatmap.R
+
+# 5. Pathway enrichment analysis
+Rscript 05_pathway_analysis.R
 ```
 
 ## Heatmap Output
-- Output directory: `heatmaps/`
-- Uses VST-normalized counts from each group
-- Compares significant genes across all groups (GF 24h, GF 6h, SPF 24h, SPF 6h)
+- Heatmaps saved to each group's `results/` folder
+- For each comparison, shows significant genes across all 4 groups
+- Dynamic sizing: shows available genes (skip if <2 genes)
 - Z-score row scaling for relative expression visualization
 - Dendrograms on both rows and columns for clustering
 
