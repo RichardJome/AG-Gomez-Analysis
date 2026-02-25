@@ -48,7 +48,7 @@ All packages available via Bioconductor or CRAN:
 
 ```r
 install.packages(c("BiocManager", "dplyr", "tidyr", "readxl", "ggplot2", "ggVennDiagram"))
-BiocManager::install(c("DESeq2", "EnhancedVolcano"))
+BiocManager::install(c("DESeq2", "EnhancedVolcano", "clusterProfiler", "org.Mm.eg.db"))
 ```
 
 | Package | Purpose |
@@ -59,6 +59,8 @@ BiocManager::install(c("DESeq2", "EnhancedVolcano"))
 | ggplot2 | Base plotting |
 | ggVennDiagram | Venn diagrams |
 | EnhancedVolcano | Volcano plots |
+| clusterProfiler | Pathway enrichment (GO/KEGG) |
+| org.Mm.eg.db | Mouse gene annotation |
 
 ## How to Run
 
@@ -138,12 +140,18 @@ gf_24h/
     ├── volcano_Untreated_vs_SG1B.png
     ├── volcano_Untreated_vs_SG1C.png
     ├── volcano_SG1B_vs_SG1C.png
-    └── heatmap_*.png (varies by available genes)
+    ├── heatmap_*.png (varies by available genes)
+    ├── pathway_go_Untreated_vs_SG1B.png
+    ├── pathway_kegg_Untreated_vs_SG1B.png
+    ├── pathway_go_Untreated_vs_SG1C.png
+    └── pathway_kegg_Untreated_vs_SG1C.png
 
 gf_6h/   (same structure)
 spf_24h/ (same structure)
 spf_6h/  (same structure)
 ```
+
+Note: Pathway plots are only generated for comparisons with ≥3 significant genes.
 
 ## Key Biological Findings (from initial GF 24h analysis)
 
@@ -165,7 +173,7 @@ spf_6h/  (same structure)
 - [x] 02_venn_diagram.R - Creates Venn diagrams for all 4 groups
 - [x] 03_volcano_plots.R - Generates volcano plots for all 4 groups
 - [x] 04_heatmap.R - Generates clustered heatmaps comparing all groups
-- [ ] 05_pathway_analysis.R - Pathway enrichment (GO/KEGG)
+- [x] 05_pathway_analysis.R - Pathway enrichment (GO/KEGG) per comparison
 
 ## How to Run
 

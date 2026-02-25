@@ -46,7 +46,10 @@ AG Gomez Analysis/
 │       ├── venn_diagram.png
 │       ├── volcano_Untreated_vs_SG1B.png
 │       ├── volcano_Untreated_vs_SG1C.png
-│       └── volcano_SG1B_vs_SG1C.png
+│       ├── volcano_SG1B_vs_SG1C.png
+│       ├── heatmap_*.png
+│       ├── pathway_go_*.png
+│       └── pathway_kegg_*.png
 │
 ├── gf_6h/
 │   ├── rds/
@@ -63,6 +66,8 @@ AG Gomez Analysis/
 ├── 01_de_analysis.R
 ├── 02_venn_diagram.R
 ├── 03_volcano_plots.R
+├── 04_heatmap.R
+├── 05_pathway_analysis.R
 ├── README.md
 └── Experiment_5.xlsx
 ```
@@ -117,7 +122,22 @@ Rscript 02_venn_diagram.R
 
 # 3. Generate volcano plots
 Rscript 03_volcano_plots.R
+
+# 4. Generate heatmaps
+Rscript 04_heatmap.R
+
+# 5. Pathway enrichment analysis (GO/KEGG)
+Rscript 05_pathway_analysis.R
 ```
+
+---
+
+## Pathway Analysis
+
+- Generates GO and KEGG enrichment plots for each comparison
+- Only runs for comparisons with ≥3 significant genes
+- Output: `pathway_go_<comparison>.png` and `pathway_kegg_<comparison>.png`
+- Titles include group and comparison name (e.g., "GO Enrichment - SPF 24h - Untreated vs SG1C")
 
 ---
 
