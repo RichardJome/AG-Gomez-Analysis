@@ -3,6 +3,9 @@
 ## Project Overview
 Differential gene expression analysis of epidermal organoids from mice treated with different Staphylococcus epidermidis strains.
 
+## Author
+**Richard Jome**
+
 ## Experiment: Experiment 5 (Omar)
 
 ### Mice
@@ -212,6 +215,16 @@ sink()
   - `pathway_go_<comparison>_DOWN.png` - Downregulated genes only
 - Only runs for comparisons with ≥3 significant genes in each direction
 - Each group folder has a `summary.txt` with statistics and file listing
+
+---
+
+## Sample Output
+
+### Volcano Plot (GF 24h - Untreated vs SG1C)
+
+![Volcano Plot](gf_24h/results/volcano_Untreated_vs_SG1C.png)
+
+*Volcano plot showing differential expression. Left = higher in Untreated, Right = higher in treatment. Colors indicate significance (grey → green → blue → red).*
 
 ---
 
