@@ -43,13 +43,16 @@ AG Gomez Analysis/
 │   │   ├── res_Untreated_vs_SG1C.rds
 │   │   └── res_SG1B_vs_SG1C.rds
 │   └── results/
+│       ├── summary.txt
 │       ├── venn_diagram.png
 │       ├── volcano_Untreated_vs_SG1B.png
 │       ├── volcano_Untreated_vs_SG1C.png
 │       ├── volcano_SG1B_vs_SG1C.png
 │       ├── heatmap_*.png
-│       ├── pathway_go_*.png
-│       └── pathway_kegg_*.png
+│       ├── pathway_go_*_UP.png
+│       ├── pathway_go_*_DOWN.png
+│       ├── pathway_kegg_*_UP.png
+│       └── pathway_kegg_*_DOWN.png
 │
 ├── gf_6h/
 │   ├── rds/
@@ -68,8 +71,11 @@ AG Gomez Analysis/
 ├── 03_volcano_plots.R
 ├── 04_heatmap.R
 ├── 05_pathway_analysis.R
+├── 06_summary_files.R
+├── 07_pdf_report.R
 ├── README.md
-└── Experiment_5.xlsx
+├── Experiment_5.xlsx
+└── Experiment_5_Report.pdf
 ```
 
 ---
@@ -94,12 +100,31 @@ For each group, three DESeq2 contrasts:
 
 ## Results Summary
 
+### Total Significant Genes (padj < 0.05, |log2FC| > 1)
+
 | Group | U vs SG1B | U vs SG1C | SG1B vs SG1C |
 |-------|------------|------------|---------------|
 | GF 24h | 19 | 50 | 10 |
 | GF 6h | 6 | 1 | 0 |
 | SPF 24h | 0 | 165 | 0 |
 | SPF 6h | 22 | 152 | 2 |
+
+### Upregulated / Downregulated Breakdown
+
+| Group | Comparison | Significant | Upregulated | Downregulated |
+|-------|------------|-------------|-------------|----------------|
+| GF 24h | U vs SG1B | 19 | 8 | 11 |
+| GF 24h | U vs SG1C | 50 | 22 | 28 |
+| GF 24h | SG1B vs SG1C | 10 | 0 | 10 |
+| GF 6h | U vs SG1B | 6 | 3 | 3 |
+| GF 6h | U vs SG1C | 1 | 1 | 0 |
+| GF 6h | SG1B vs SG1C | 0 | 0 | 0 |
+| SPF 24h | U vs SG1B | 0 | 0 | 0 |
+| SPF 24h | U vs SG1C | 165 | 102 | 63 |
+| SPF 24h | SG1B vs SG1C | 0 | 0 | 0 |
+| SPF 6h | U vs SG1B | 22 | 22 | 0 |
+| SPF 6h | U vs SG1C | 152 | 142 | 10 |
+| SPF 6h | SG1B vs SG1C | 2 | 0 | 2 |
 
 ---
 
@@ -126,8 +151,14 @@ Rscript 03_volcano_plots.R
 # 4. Generate heatmaps
 Rscript 04_heatmap.R
 
-# 5. Pathway enrichment analysis (GO/KEGG)
+# 5. Pathway enrichment analysis (UP/DOWN separated)
 Rscript 05_pathway_analysis.R
+
+# 6. Generate summary files
+Rscript 06_summary_files.R
+
+# 7. Generate PDF report
+Rscript 07_pdf_report.R
 ```
 
 ---
@@ -135,9 +166,11 @@ Rscript 05_pathway_analysis.R
 ## Pathway Analysis
 
 - Generates GO and KEGG enrichment plots for each comparison
-- Only runs for comparisons with ≥3 significant genes
-- Output: `pathway_go_<comparison>.png` and `pathway_kegg_<comparison>.png`
-- Titles include group and comparison name (e.g., "GO Enrichment - SPF 24h - Untreated vs SG1C")
+- **Separates upregulated and downregulated genes**:
+  - `pathway_go_<comparison>_UP.png` - Upregulated genes only
+  - `pathway_go_<comparison>_DOWN.png` - Downregulated genes only
+- Only runs for comparisons with ≥3 significant genes in each direction
+- Each group folder has a `summary.txt` with statistics and file listing
 
 ---
 

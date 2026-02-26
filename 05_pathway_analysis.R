@@ -32,6 +32,48 @@ convert_ensembl_to_entrez <- function(ensembl_ids) {
   return(entrez_ids[entrez_ids != ""])
 }
 
+run_pathway_for_genes <- function(entrez_ids, title_base, results_dir, prefix, min_genes = 3) {
+  if (length(entrez_ids) < min_genes) {
+    cat(sprintf("      %s: Only %d genes, skipping\n", prefix, length(entrez_ids)))
+    return(NULL)
+  }
+  
+  cat(sprintf("      Running %s analysis with %d genes...\n", prefix, length(entrez_ids)))
+  
+  ego <- enrichGO(
+    gene          = entrez_ids,
+    OrgDb         = org.Mm.eg.db,
+    keyType       = "ENTREZID",
+    ont           = "BP",
+    pAdjustMethod = "BH",
+    pvalueCutoff  = 0.05,
+    qvalueCutoff  = 0.2
+  )
+  
+  if (!is.null(ego) && nrow(ego) > 0) {
+    go_file <- file.path(results_dir, paste0("pathway_go_", prefix, ".png"))
+    png(go_file, width = 14, height = 10, units = "in", res = 300)
+    print(dotplot(ego, showCategory = 20) + ggtitle(paste("GO Enrichment -", title_base)))
+    dev.off()
+  }
+  
+  ekegg <- enrichKEGG(
+    gene       = entrez_ids,
+    organism   = "mmu",
+    pAdjustMethod = "BH",
+    pvalueCutoff  = 0.05
+  )
+  
+  if (!is.null(ekegg) && nrow(ekegg) > 0) {
+    kegg_file <- file.path(results_dir, paste0("pathway_kegg_", prefix, ".png"))
+    png(kegg_file, width = 14, height = 10, units = "in", res = 300)
+    print(dotplot(ekegg, showCategory = 20) + ggtitle(paste("KEGG Enrichment -", title_base)))
+    dev.off()
+  }
+  
+  return(list(go = ego, kegg = ekegg))
+}
+
 run_pathway_analysis <- function(group_name, group_label) {
   cat(sprintf("\n=== Processing: %s ===\n", group_label))
   
@@ -53,64 +95,42 @@ run_pathway_analysis <- function(group_name, group_label) {
     
     sig_all <- res_df[res_df$padj < 0.05 & !is.na(res_df$padj) & abs(res_df$log2FoldChange) >= 1, ]
     
-    if (nrow(sig_all) < 3) {
-      cat(sprintf("  %s: Only %d significant genes, skipping\n", comp, nrow(sig_all)))
-      next
-    }
+    sig_up <- sig_all[sig_all$log2FoldChange > 0, ]
+    sig_down <- sig_all[sig_all$log2FoldChange < 0, ]
     
-    sig_genes <- rownames(sig_all)
-    cat(sprintf("  %s: %d significant genes\n", comp, length(sig_genes)))
+    n_up <- nrow(sig_up)
+    n_down <- nrow(sig_down)
+    n_total <- nrow(sig_all)
     
-    entrez_ids <- convert_ensembl_to_entrez(sig_genes)
-    cat(sprintf("    -> Converted to Entrez IDs: %d\n", length(entrez_ids)))
-    
-    if (length(entrez_ids) < 3) {
-      cat(sprintf("    -> Not enough mapped genes, skipping\n"))
-      next
-    }
+    cat(sprintf("  %s: %d significant (%d up, %d down)\n", comp, n_total, n_up, n_down))
     
     title_base <- paste(group_label, "-", comp)
     
-    cat("    Running GO enrichment...\n")
-    ego <- enrichGO(
-      gene          = entrez_ids,
-      OrgDb         = org.Mm.eg.db,
-      keyType       = "ENTREZID",
-      ont           = "BP",
-      pAdjustMethod = "BH",
-      pvalueCutoff  = 0.05,
-      qvalueCutoff  = 0.2
-    )
-    
-    if (!is.null(ego) && nrow(ego) > 0) {
-      cat("    Saving GO plot...\n")
-      go_file <- file.path(results_dir, paste0("pathway_go_", comp, ".png"))
-      png(go_file, width = 14, height = 10, units = "in", res = 300)
-      print(dotplot(ego, showCategory = 20) + ggtitle(paste("GO Enrichment -", title_base)))
-      dev.off()
+    if (n_up >= 3) {
+      cat("    Processing UPREGULATED genes...\n")
+      up_genes <- rownames(sig_up)
+      entrez_up <- convert_ensembl_to_entrez(up_genes)
+      if (length(entrez_up) >= 3) {
+        run_pathway_for_genes(entrez_up, paste(title_base, "(UP)"), results_dir, 
+                              paste0(comp, "_UP"), min_genes = 3)
+      }
     }
     
-    cat("    Running KEGG enrichment...\n")
-    ekegg <- enrichKEGG(
-      gene       = entrez_ids,
-      organism   = "mmu",
-      pAdjustMethod = "BH",
-      pvalueCutoff  = 0.05
-    )
-    
-    if (!is.null(ekegg) && nrow(ekegg) > 0) {
-      cat("    Saving KEGG plot...\n")
-      kegg_file <- file.path(results_dir, paste0("pathway_kegg_", comp, ".png"))
-      png(kegg_file, width = 14, height = 10, units = "in", res = 300)
-      print(dotplot(ekegg, showCategory = 20) + ggtitle(paste("KEGG Enrichment -", title_base)))
-      dev.off()
+    if (n_down >= 3) {
+      cat("    Processing DOWNREGULATED genes...\n")
+      down_genes <- rownames(sig_down)
+      entrez_down <- convert_ensembl_to_entrez(down_genes)
+      if (length(entrez_down) >= 3) {
+        run_pathway_for_genes(entrez_down, paste(title_base, "(DOWN)"), results_dir, 
+                              paste0(comp, "_DOWN"), min_genes = 3)
+      }
     }
     
     cat(sprintf("    Completed: %s\n", comp))
   }
 }
 
-cat("=== PATHWAY ANALYSIS (Separate Comparisons - PNG OUTPUT) ===\n")
+cat("=== PATHWAY ANALYSIS (UP/DOWN SEPARATED - PNG OUTPUT) ===\n")
 
 for (group_name in names(groups)) {
   run_pathway_analysis(group_name, groups[[group_name]])

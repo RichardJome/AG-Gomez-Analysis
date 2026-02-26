@@ -16,10 +16,12 @@
 D:\AG Gomez Analysis/
 ├── 01_de_analysis.R        # Main DE analysis script
 ├── 02_venn_diagram.R       # Venn diagram generator
-├── 03_volcano_plots.R       # Volcano plot generator
+├── 03_volcano_plots.R      # Volcano plot generator
 ├── 04_heatmap.R            # Heatmap generator (genes across all groups)
-├── 05_pathway_analysis.R   # Pathway enrichment analysis (clusterProfiler)
-├── AGENTS.md                # This file
+├── 05_pathway_analysis.R   # Pathway enrichment (UP/DOWN separated)
+├── 06_summary_files.R      # Generate summary.txt for each group
+├── 07_pdf_report.R        # Generate PDF report with all plots
+├── AGENTS.md               # This file
 ├── gf_24h/                 # GF 24h analysis results
 │   ├── rds/                # DESeq2 results and VST counts
 │   └── results/            # Plots (venn, volcano, heatmap)
@@ -136,22 +138,26 @@ gf_24h/
 │   ├── res_Untreated_vs_SG1C.rds
 │   └── res_SG1B_vs_SG1C.rds
 └── results/
+    ├── summary.txt                    # Statistics and file listing
     ├── venn_diagram.png
     ├── volcano_Untreated_vs_SG1B.png
     ├── volcano_Untreated_vs_SG1C.png
     ├── volcano_SG1B_vs_SG1C.png
     ├── heatmap_*.png (varies by available genes)
-    ├── pathway_go_Untreated_vs_SG1B.png
-    ├── pathway_kegg_Untreated_vs_SG1B.png
-    ├── pathway_go_Untreated_vs_SG1C.png
-    └── pathway_kegg_Untreated_vs_SG1C.png
+    ├── pathway_go_*_UP.png           # GO enrichment - Upregulated
+    ├── pathway_go_*_DOWN.png         # GO enrichment - Downregulated
+    ├── pathway_kegg_*_UP.png        # KEGG enrichment - Upregulated
+    └── pathway_kegg_*_DOWN.png      # KEGG enrichment - Downregulated
 
 gf_6h/   (same structure)
 spf_24h/ (same structure)
 spf_6h/  (same structure)
 ```
 
-Note: Pathway plots are only generated for comparisons with ≥3 significant genes.
+Note: 
+- Pathway plots are only generated for comparisons with ≥3 significant genes
+- Pathway analysis separates UP and DOWN genes (best practice)
+- Each group folder has a summary.txt with statistics and file listing
 
 ## Key Biological Findings (from initial GF 24h analysis)
 
@@ -173,7 +179,9 @@ Note: Pathway plots are only generated for comparisons with ≥3 significant gen
 - [x] 02_venn_diagram.R - Creates Venn diagrams for all 4 groups
 - [x] 03_volcano_plots.R - Generates volcano plots for all 4 groups
 - [x] 04_heatmap.R - Generates clustered heatmaps comparing all groups
-- [x] 05_pathway_analysis.R - Pathway enrichment (GO/KEGG) per comparison
+- [x] 05_pathway_analysis.R - Pathway enrichment (UP/DOWN separated)
+- [x] 06_summary_files.R - Generates summary.txt for each group
+- [x] 07_pdf_report.R - Generates PDF report with all plots
 
 ## How to Run
 
@@ -190,8 +198,14 @@ Rscript 03_volcano_plots.R
 # 4. Generate heatmaps
 Rscript 04_heatmap.R
 
-# 5. Pathway enrichment analysis
+# 5. Pathway enrichment analysis (UP/DOWN separated)
 Rscript 05_pathway_analysis.R
+
+# 6. Generate summary files
+Rscript 06_summary_files.R
+
+# 7. Generate PDF report
+Rscript 07_pdf_report.R
 ```
 
 ## Heatmap Output
