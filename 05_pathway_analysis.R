@@ -1,9 +1,17 @@
+# 05_pathway_analysis.R ------------------------------------------------------------------------
+# Pathway Enrichment Analysis for Experiment 5
+# Author: Richard Jome
+# Date: 2025
+# Purpose: GO and KEGG pathway enrichment analysis (UP/DOWN separated)
+
+# Load Libraries -------------------------------------------------------------------
 library(clusterProfiler)
 library(ggplot2)
 library(DESeq2)
 library(org.Mm.eg.db)
 library(AnnotationDbi)
 
+# Define Groups --------------------------------------------------------------------
 groups <- list(
   "gf_24h" = "Germ Free 24h",
   "gf_6h" = "Germ Free 6h",
@@ -13,6 +21,10 @@ groups <- list(
 
 comparisons <- c("Untreated_vs_SG1B", "Untreated_vs_SG1C", "SG1B_vs_SG1C")
 
+# Function: Convert ENSEMBL to Entrez IDs -----------------------------------------
+#' Convert Ensembl gene IDs to Entrez IDs for pathway analysis
+#' @param ensembl_ids Vector of Ensembl gene IDs
+#' @return Vector of Entrez gene IDs
 convert_ensembl_to_entrez <- function(ensembl_ids) {
   mapped <- tryCatch({
     mapIds(
@@ -32,7 +44,16 @@ convert_ensembl_to_entrez <- function(ensembl_ids) {
   return(entrez_ids[entrez_ids != ""])
 }
 
+# Function: Run Pathway Analysis for Gene Set -------------------------------------
+#' Run GO and KEGG enrichment analysis
+#' @param entrez_ids Vector of Entrez gene IDs
+#' @param title_base Base title for plots
+#' @param results_dir Output directory for plots
+#' @param prefix Filename prefix
+#' @param min_genes Minimum number of genes required
+#' @return List of enrichment results
 run_pathway_for_genes <- function(entrez_ids, title_base, results_dir, prefix, min_genes = 3) {
+  
   if (length(entrez_ids) < min_genes) {
     cat(sprintf("      %s: Only %d genes, skipping\n", prefix, length(entrez_ids)))
     return(NULL)
@@ -40,6 +61,7 @@ run_pathway_for_genes <- function(entrez_ids, title_base, results_dir, prefix, m
   
   cat(sprintf("      Running %s analysis with %d genes...\n", prefix, length(entrez_ids)))
   
+  # GO enrichment
   ego <- enrichGO(
     gene          = entrez_ids,
     OrgDb         = org.Mm.eg.db,
@@ -57,6 +79,7 @@ run_pathway_for_genes <- function(entrez_ids, title_base, results_dir, prefix, m
     dev.off()
   }
   
+  # KEGG enrichment
   ekegg <- enrichKEGG(
     gene       = entrez_ids,
     organism   = "mmu",
@@ -74,7 +97,13 @@ run_pathway_for_genes <- function(entrez_ids, title_base, results_dir, prefix, m
   return(list(go = ego, kegg = ekegg))
 }
 
+# Function: Run Pathway Analysis for Group -----------------------------------------
+#' Run pathway analysis for all comparisons in a group
+#' @param group_name Directory name for the group
+#' @param group_label Display label for the group
+#' @return Saves pathway plots to results directory
 run_pathway_analysis <- function(group_name, group_label) {
+  
   cat(sprintf("\n=== Processing: %s ===\n", group_label))
   
   results_dir <- file.path(group_name, "results")
@@ -106,6 +135,7 @@ run_pathway_analysis <- function(group_name, group_label) {
     
     title_base <- paste(group_label, "-", comp)
     
+    # Upregulated genes
     if (n_up >= 3) {
       cat("    Processing UPREGULATED genes...\n")
       up_genes <- rownames(sig_up)
@@ -116,6 +146,7 @@ run_pathway_analysis <- function(group_name, group_label) {
       }
     }
     
+    # Downregulated genes
     if (n_down >= 3) {
       cat("    Processing DOWNREGULATED genes...\n")
       down_genes <- rownames(sig_down)
@@ -130,6 +161,7 @@ run_pathway_analysis <- function(group_name, group_label) {
   }
 }
 
+# Main: Run Pathway Analysis ------------------------------------------------------
 cat("=== PATHWAY ANALYSIS (UP/DOWN SEPARATED - PNG OUTPUT) ===\n")
 
 for (group_name in names(groups)) {
@@ -137,3 +169,10 @@ for (group_name in names(groups)) {
 }
 
 cat("\n=== COMPLETE ===\n")
+
+# Save Session Info ---------------------------------------------------------------
+sink("session_info_05.txt")
+sessionInfo()
+sink()
+
+cat("Session info saved to session_info_05.txt\n")

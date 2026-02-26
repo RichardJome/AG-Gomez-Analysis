@@ -1,5 +1,18 @@
+# 03_volcano_plots.R ------------------------------------------------------------------------
+# Volcano Plot Generator for Experiment 5
+# Author: Richard Jome
+# Date: 2025
+# Purpose: Create volcano plots for differential expression results
+
+# Load Libraries -------------------------------------------------------------------
 library(EnhancedVolcano)
 
+# Function: Create Volcano Plots --------------------------------------------------
+#' Create volcano plots for DESeq2 results
+#' @param group_name Name of the experimental group
+#' @param input_dir Directory containing DESeq2 results (RDS files)
+#' @param output_dir Output directory for volcano plot PNGs
+#' @return Saves volcano plots to PNG files
 create_volcano_plots <- function(group_name, input_dir, output_dir) {
   
   cat(sprintf("\n=== Creating volcano plots for: %s ===\n", group_name))
@@ -12,6 +25,7 @@ create_volcano_plots <- function(group_name, input_dir, output_dir) {
   df2 <- as.data.frame(res2)
   df3 <- as.data.frame(res3)
   
+  # Calculate y-axis limits
   ylim1_val <- max(-log10(min(df1$padj[df1$padj > 0 & df1$padj < 1], na.rm = TRUE)) + 1, 5)
   ylim2_val <- max(-log10(min(df2$padj[df2$padj > 0 & df2$padj < 1], na.rm = TRUE)) + 1, 5)
   ylim3_val <- max(-log10(min(df3$padj[df3$padj > 0 & df3$padj < 1], na.rm = TRUE)) + 1, 5)
@@ -20,6 +34,7 @@ create_volcano_plots <- function(group_name, input_dir, output_dir) {
   ylim2 <- c(0, ylim2_val)
   ylim3 <- c(0, ylim3_val)
   
+  # Extract significant genes for labeling
   sig_df1 <- df1[df1$padj < 0.05 & abs(df1$log2FoldChange) > 1 & !is.na(df1$gene) & !is.na(df1$padj) & !is.na(df1$log2FoldChange), ]
   sig_df1 <- sig_df1[order(sig_df1$padj), ]
   sig_genes1 <- sig_df1$gene
@@ -32,6 +47,7 @@ create_volcano_plots <- function(group_name, input_dir, output_dir) {
   sig_df3 <- sig_df3[order(sig_df3$padj), ]
   sig_genes3 <- sig_df3$gene
   
+  # Volcano plot 1: Untreated vs SG1B
   p1 <- EnhancedVolcano(df1,
     lab = df1$gene,
     x = 'log2FoldChange',
@@ -65,6 +81,7 @@ create_volcano_plots <- function(group_name, input_dir, output_dir) {
     vlineCol = "black",
     vlineWidth = 0.5)
   
+  # Volcano plot 2: Untreated vs SG1C
   p2 <- EnhancedVolcano(df2,
     lab = df2$gene,
     x = 'log2FoldChange',
@@ -98,6 +115,7 @@ create_volcano_plots <- function(group_name, input_dir, output_dir) {
     vlineCol = "black",
     vlineWidth = 0.5)
   
+  # Volcano plot 3: SG1B vs SG1C
   p3 <- EnhancedVolcano(df3,
     lab = df3$gene,
     x = 'log2FoldChange',
@@ -142,12 +160,24 @@ create_volcano_plots <- function(group_name, input_dir, output_dir) {
   cat(sprintf("  - Untreated vs SG1C: %d significant genes\n", length(sig_genes2)))
   cat(sprintf("  - SG1B vs SG1C: %d significant genes\n", length(sig_genes3)))
   
+  # Clean up
+  rm(df1, df2, df3, sig_df1, sig_df2, sig_df3)
+  gc()
+  
   return(invisible(NULL))
 }
 
+# Create Volcano Plots ------------------------------------------------------------
 create_volcano_plots("GF 24h", "gf_24h", "gf_24h/results")
 create_volcano_plots("GF 6h", "gf_6h", "gf_6h/results")
 create_volcano_plots("SPF 24h", "spf_24h", "spf_24h/results")
 create_volcano_plots("SPF 6h", "spf_6h", "spf_6h/results")
 
 cat("\n=== All volcano plots complete! ===\n")
+
+# Save Session Info ---------------------------------------------------------------
+sink("session_info_03.txt")
+sessionInfo()
+sink()
+
+cat("Session info saved to session_info_03.txt\n")

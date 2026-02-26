@@ -1,10 +1,16 @@
+# 07_pdf_report.R ------------------------------------------------------------------------
+# PDF Report Generator for Experiment 5
+# Author: Richard Jome
+# Date: 2025
+# Purpose: Generate comprehensive PDF report with all plots and summaries
+
+# Load Libraries -------------------------------------------------------------------
 library(png)
 library(grid)
 library(ggplot2)
 library(ggVennDiagram)
 
-cat("=== GENERATING PDF REPORT ===\n\n")
-
+# Define Groups (order for report) ------------------------------------------------
 groups_order <- list(
   "gf_6h" = "Germ Free 6h",
   "gf_24h" = "Germ Free 24h",
@@ -14,6 +20,10 @@ groups_order <- list(
 
 comparisons <- c("Untreated_vs_SG1B", "Untreated_vs_SG1C", "SG1B_vs_SG1C")
 
+# Function: Get Statistics --------------------------------------------------------
+#' Extract statistics from DESeq2 results
+#' @param group_name Directory name for the group
+#' @return Data frame of statistics
 get_stats <- function(group_name) {
   rds_dir <- file.path(group_name, "rds")
   stats_df <- data.frame()
@@ -39,8 +49,14 @@ get_stats <- function(group_name) {
   return(stats_df)
 }
 
+# Page Counter ---------------------------------------------------------------------
 page_counter <- 0
 
+# Function: Add PNG Page ----------------------------------------------------------
+#' Add a PNG image to the PDF on its own page
+#' @param img_path Path to PNG file
+#' @param title Optional title for the page
+#' @return NULL (adds page to PDF)
 add_png_page <- function(img_path, title = "") {
   page_counter <<- page_counter + 1
   
@@ -63,14 +79,15 @@ add_png_page <- function(img_path, title = "") {
               gp = gpar(fontsize = 14, fontface = "bold"))
   }
   
-  # Figure centered, leaving space at top and bottom
+  # Figure centered
   grid.raster(img, y = 0.50, height = 0.84, interpolate = FALSE)
   
-  # Footer with page number at bottom
+  # Footer with page number
   grid.text(paste("Page", page_counter), y = 0.03, 
             gp = gpar(fontsize = 10, col = "gray50"))
 }
 
+# Function: Add Title Page --------------------------------------------------------
 add_title_page <- function() {
   page_counter <<- page_counter + 1
   
@@ -80,13 +97,14 @@ add_title_page <- function() {
   grid.text("Differential Gene Expression Analysis", y = 0.55, 
             gp = gpar(fontsize = 16))
   grid.text("Performed by Richard Jome", y = 0.45, 
-            gpar(fontsize = 14))
+            gp = gpar(fontsize = 14))
   grid.text(paste("Date:", Sys.Date()), y = 0.35, 
             gp = gpar(fontsize = 12, col = "gray50"))
   grid.text(paste("Page", page_counter), y = 0.03, 
             gp = gpar(fontsize = 10, col = "gray50"))
 }
 
+# Function: Add Summary Page -------------------------------------------------------
 add_summary_page <- function() {
   page_counter <<- page_counter + 1
   
@@ -152,6 +170,11 @@ add_summary_page <- function() {
             gp = gpar(fontsize = 10, col = "gray50"))
 }
 
+# Function: Add Group Section -----------------------------------------------------
+#' Add all plots for a group to the PDF
+#' @param group_name Directory name for the group
+#' @param group_label Display label for the group
+#' @return NULL (adds pages to PDF)
 add_group_section <- function(group_name, group_label) {
   cat(sprintf("Processing: %s\n", group_label))
   
@@ -165,7 +188,7 @@ add_group_section <- function(group_name, group_label) {
   grid.text(paste("Page", page_counter), y = 0.03, 
             gp = gpar(fontsize = 10, col = "gray50"))
   
-  # Volcano plots - one per page
+  # Volcano plots
   for (comp in comparisons) {
     res_file <- file.path(group_name, "rds", paste0("res_", comp, ".rds"))
     volcano_file <- file.path(results_dir, paste0("volcano_", comp, ".png"))
@@ -174,7 +197,6 @@ add_group_section <- function(group_name, group_label) {
       title_str <- paste(group_label, "- Volcano:", gsub("_", " vs ", comp))
       add_png_page(volcano_file, title_str)
     } else if (file.exists(res_file)) {
-      # Generate if not exists
       res <- readRDS(res_file)
       res_df <- as.data.frame(res)
       sig_count <- sum(res_df$padj < 0.05 & !is.na(res_df$padj) & abs(res_df$log2FoldChange) >= 1)
@@ -187,7 +209,6 @@ add_group_section <- function(group_name, group_label) {
       grid.text(title_str, y = 0.97, 
                 gp = gpar(fontsize = 14, fontface = "bold"))
       
-      # Generate volcano plot using base R
       par(mar = c(4, 4, 2, 1))
       with(res_df, plot(log2FoldChange, -log10(padj), 
                        main = title_str,
@@ -210,13 +231,13 @@ add_group_section <- function(group_name, group_label) {
     }
   }
   
-  # Venn diagram - one page
+  # Venn diagram
   venn_file <- file.path(results_dir, "venn_diagram.png")
   if (file.exists(venn_file)) {
     add_png_page(venn_file, paste(group_label, "- Venn Diagram"))
   }
   
-  # Heatmaps - one page each
+  # Heatmaps
   heatmap_files <- list.files(results_dir, pattern = "heatmap.*\\.png$", full.names = TRUE)
   heatmap_files <- sort(heatmap_files)
   
@@ -226,7 +247,7 @@ add_group_section <- function(group_name, group_label) {
     add_png_page(hfile, title_str)
   }
   
-  # Pathway plots - one page each
+  # Pathway plots
   pathway_files <- list.files(results_dir, pattern = "pathway_.*\\.png$", full.names = TRUE)
   pathway_files <- sort(pathway_files)
   
@@ -239,7 +260,9 @@ add_group_section <- function(group_name, group_label) {
   }
 }
 
-# Generate PDF
+# Main: Generate PDF ---------------------------------------------------------------
+cat("=== GENERATING PDF REPORT ===\n\n")
+
 pdf("Experiment_5_Report.pdf", width = 11, height = 8.5, onefile = TRUE)
 
 add_title_page()
@@ -254,3 +277,10 @@ dev.off()
 cat("\n=== PDF REPORT GENERATED ===\n")
 cat("Output: Experiment_5_Report.pdf\n")
 cat(sprintf("Total pages: %d\n", page_counter))
+
+# Save Session Info ---------------------------------------------------------------
+sink("session_info_07.txt")
+sessionInfo()
+sink()
+
+cat("Session info saved to session_info_07.txt\n")

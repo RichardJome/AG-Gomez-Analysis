@@ -1,5 +1,13 @@
+# 06_summary_files.R ------------------------------------------------------------------------
+# Summary File Generator for Experiment 5
+# Author: Richard Jome
+# Date: 2025
+# Purpose: Generate summary.txt files for each group with statistics and file listings
+
+# Load Libraries -------------------------------------------------------------------
 library(DESeq2)
 
+# Define Groups --------------------------------------------------------------------
 groups <- list(
   "gf_24h" = "Germ Free 24h",
   "gf_6h" = "Germ Free 6h",
@@ -9,7 +17,13 @@ groups <- list(
 
 comparisons <- c("Untreated_vs_SG1B", "Untreated_vs_SG1C", "SG1B_vs_SG1C")
 
+# Function: Generate Summary for Group ---------------------------------------------
+#' Generate summary.txt file for a group
+#' @param group_name Directory name for the group
+#' @param group_label Display label for the group
+#' @return Data frame of statistics
 generate_summary <- function(group_name, group_label) {
+  
   cat(sprintf("\n=== Generating summary: %s ===\n", group_label))
   
   results_dir <- file.path(group_name, "results")
@@ -17,6 +31,7 @@ generate_summary <- function(group_name, group_label) {
   
   dir.create(results_dir, showWarnings = FALSE)
   
+  # Build statistics section
   summary_lines <- c(
     paste("===", toupper(group_label), "SUMMARY ==="),
     "",
@@ -65,6 +80,7 @@ generate_summary <- function(group_name, group_label) {
     ))
   }
   
+  # List generated files
   summary_lines <- c(summary_lines, "", "GENERATED FILES:", "---------------")
   
   files <- list.files(results_dir, pattern = "\\.(png|txt)$")
@@ -77,9 +93,9 @@ generate_summary <- function(group_name, group_label) {
     }
   }
   
+  # Pathway analysis status
   summary_lines <- c(summary_lines, "", "PATHWAY ANALYSIS STATUS:", "----------------------")
   
-  pathway_status <- c()
   for (comp in comparisons) {
     res_file <- file.path(rds_dir, paste0("res_", comp, ".rds"))
     if (!file.exists(res_file)) {
@@ -118,6 +134,7 @@ generate_summary <- function(group_name, group_label) {
   return(invisible(stats_data))
 }
 
+# Main: Generate All Summaries -----------------------------------------------------
 cat("=== GENERATING SUMMARY FILES ===\n")
 
 all_stats <- data.frame()
@@ -134,3 +151,10 @@ cat("\n=== ALL STATISTICS COMBINED ===\n")
 print(all_stats)
 
 cat("\n=== COMPLETE ===\n")
+
+# Save Session Info ---------------------------------------------------------------
+sink("session_info_06.txt")
+sessionInfo()
+sink()
+
+cat("Session info saved to session_info_06.txt\n")

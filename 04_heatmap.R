@@ -1,8 +1,16 @@
+# 04_heatmap.R ------------------------------------------------------------------------
+# Heatmap Generator for Experiment 5
+# Author: Richard Jome
+# Date: 2025
+# Purpose: Create clustered heatmaps of differentially expressed genes
+
+# Load Libraries -------------------------------------------------------------------
 library(pheatmap)
 library(DESeq2)
 library(dplyr)
 library(readxl)
 
+# Define Groups --------------------------------------------------------------------
 groups <- list(
   "gf_24h" = list(
     cols = c("GF1_5_24_C1", "GF1_5_24_C2", "GF1_5_24_C3",
@@ -30,8 +38,10 @@ groups <- list(
   )
 )
 
+# Define Contrasts -----------------------------------------------------------------
 contrasts <- c("Untreated_vs_SG1B", "Untreated_vs_SG1C", "SG1B_vs_SG1C")
 
+# Build Sample Annotations ---------------------------------------------------------
 all_conditions <- c()
 for (group_name in names(groups)) {
   all_conditions <- c(all_conditions, groups[[group_name]]$cond)
@@ -49,6 +59,7 @@ annotation_colors <- list(
   Microbiome = c(GF = "#9370DB", SPF = "#20B2AA")
 )
 
+# Load VST Data --------------------------------------------------------------------
 all_vst <- list()
 for (group_name in names(groups)) {
   vst_data <- readRDS(file.path(group_name, "rds", "vst_counts.rds"))
@@ -57,7 +68,16 @@ for (group_name in names(groups)) {
   all_vst[[group_name]] <- vst_subset
 }
 
+# Function: Generate Heatmap ------------------------------------------------------
+#' Create clustered heatmap for DEGs across all groups
+#' @param source_group Source group name
+#' @param contrast Comparison name
+#' @param top_n Number of top genes to include
+#' @param genes Vector of gene names
+#' @param total_sig Total significant genes available
+#' @return Saves heatmap to PNG file
 generate_heatmap <- function(source_group, contrast, top_n, genes, total_sig) {
+  
   n_genes <- length(genes)
   
   if (n_genes < 2) {
@@ -107,27 +127,28 @@ generate_heatmap <- function(source_group, contrast, top_n, genes, total_sig) {
   output_file <- sprintf("%s/results/heatmap_%s_top%d.png", source_group, contrast, n_genes)
   
   pheatmap(combined_matrix,
-           scale = "row",
-           clustering_distance_rows = "correlation",
-           clustering_distance_cols = "correlation",
-           clustering_method = "ward.D2",
-           annotation_col = col_annot,
-           annotation_colors = annotation_colors,
-           show_rownames = TRUE,
-           show_colnames = TRUE,
-           fontsize_row = 8,
-           fontsize_col = 8,
-           angle_col = 45,
-           main = sprintf("DE Genes: %s (%s) - %s across all groups", source_group, contrast, title_suffix),
-           filename = output_file,
-           width = 14,
-           height = 10)
+          scale = "row",
+          clustering_distance_rows = "correlation",
+          clustering_distance_cols = "correlation",
+          clustering_method = "ward.D2",
+          annotation_col = col_annot,
+          annotation_colors = annotation_colors,
+          show_rownames = TRUE,
+          show_colnames = TRUE,
+          fontsize_row = 8,
+          fontsize_col = 8,
+          angle_col = 45,
+          main = sprintf("DE Genes: %s (%s) - %s across all groups", source_group, contrast, title_suffix),
+          filename = output_file,
+          width = 14,
+          height = 10)
   
   cat(sprintf("    Saved: %s\n", output_file))
   
   return(output_file)
 }
 
+# Main: Generate Heatmaps ----------------------------------------------------------
 cat("\n=== Generating heatmaps for all comparisons ===\n\n")
 
 for (group_name in names(groups)) {
@@ -172,9 +193,21 @@ for (group_name in names(groups)) {
   cat("\n")
 }
 
+# Clean up old heatmaps folder
 if (dir.exists("heatmaps")) {
   unlink("heatmaps", recursive = TRUE)
   cat("\nDeleted: heatmaps/ folder\n")
 }
 
 cat("\n=== Heatmap generation complete! ===\n")
+
+# Clean up memory
+rm(all_vst)
+gc()
+
+# Save Session Info ---------------------------------------------------------------
+sink("session_info_04.txt")
+sessionInfo()
+sink()
+
+cat("Session info saved to session_info_04.txt\n")

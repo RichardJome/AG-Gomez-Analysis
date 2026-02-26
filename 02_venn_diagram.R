@@ -1,6 +1,19 @@
+# 02_venn_diagram.R ------------------------------------------------------------------------
+# Venn Diagram Generator for Experiment 5
+# Author: Richard Jome
+# Date: 2025
+# Purpose: Create Venn diagrams showing overlap of differentially expressed genes
+
+# Load Libraries -------------------------------------------------------------------
 library(ggVennDiagram)
 library(ggplot2)
 
+# Function: Create Venn Diagram ----------------------------------------------------
+#' Create Venn diagram showing overlap of DEGs between comparisons
+#' @param group_name Name of the experimental group
+#' @param input_dir Directory containing DESeq2 results (RDS files)
+#' @param output_dir Output directory for Venn diagram PNG
+#' @return Saves Venn diagram to PNG file
 create_venn <- function(group_name, input_dir, output_dir) {
   
   cat(sprintf("\n=== Creating Venn diagram for: %s ===\n", group_name))
@@ -44,12 +57,24 @@ create_venn <- function(group_name, input_dir, output_dir) {
   cat(sprintf("B (Untreated vs SG1C): %d genes\n", length(genes_B)))
   cat(sprintf("C (SG1B vs SG1C): %d genes\n", length(genes_C)))
   
+  # Clean up
+  rm(res1, res2, res3, sig1, sig2, sig3)
+  gc()
+  
   return(invisible(NULL))
 }
 
+# Create Venn Diagrams ------------------------------------------------------------
 create_venn("Germ Free 24h", "gf_24h", "gf_24h/results")
 create_venn("Germ Free 6h", "gf_6h", "gf_6h/results")
 create_venn("Specific Pathogen Free 24h", "spf_24h", "spf_24h/results")
 create_venn("Specific Pathogen Free 6h", "spf_6h", "spf_6h/results")
 
 cat("\n=== All Venn diagrams complete! ===\n")
+
+# Save Session Info ---------------------------------------------------------------
+sink("session_info_02.txt")
+sessionInfo()
+sink()
+
+cat("Session info saved to session_info_02.txt\n")

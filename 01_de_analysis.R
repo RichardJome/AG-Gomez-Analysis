@@ -1,10 +1,24 @@
+# 01_de_analysis.R ------------------------------------------------------------------------
+# Differential Expression Analysis for Experiment 5
+# Author: Richard Jome
+# Date: 2025
+# Purpose: DESeq2 analysis for Germ Free and SPF mice at 6h and 24h time points
+
+# Load Libraries -------------------------------------------------------------------
 library(DESeq2)
 library(dplyr)
 library(readxl)
 library(tidyr)
 
+# Read Data -------------------------------------------------------------------------
 df <- read_excel("Experiment_5.xlsx")
 
+# Function: Run Differential Expression Analysis ------------------------------------
+#' Run DESeq2 differential expression analysis for a experimental group
+#' @param group_name Name of the group (e.g., "GF 24h")
+#' @param sample_cols Vector of sample column names from Excel file
+#' @param output_dir Output directory path for results
+#' @return Saves DESeq2 results to RDS files in output directory
 run_de_analysis <- function(group_name, sample_cols, output_dir) {
   
   cat(sprintf("\n=== Running DE analysis for: %s ===\n", group_name))
@@ -26,6 +40,7 @@ run_de_analysis <- function(group_name, sample_cols, output_dir) {
   dds <- DESeqDataSetFromMatrix(countData = count_matrix, colData = coldata, design = ~ condition)
   dds <- DESeq(dds)
   
+  # Contrast: treatment vs control
   res_U_vs_B <- results(dds, contrast = c("condition", "SG1B", "Untreated"))
   res_U_vs_B$gene <- counts$gene_name[match(rownames(res_U_vs_B), counts$gene_id)]
   
@@ -35,16 +50,19 @@ run_de_analysis <- function(group_name, sample_cols, output_dir) {
   res_B_vs_C <- results(dds, contrast = c("condition", "SG1B", "SG1C"))
   res_B_vs_C$gene <- counts$gene_name[match(rownames(res_B_vs_C), counts$gene_id)]
   
+  # Create output directories
   dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
   dir.create(file.path(output_dir, "rds"), recursive = TRUE, showWarnings = FALSE)
   dir.create(file.path(output_dir, "results"), recursive = TRUE, showWarnings = FALSE)
   
+  # Save DESeq2 results
   saveRDS(res_U_vs_B, file.path(output_dir, "rds", "res_Untreated_vs_SG1B.rds"))
   saveRDS(res_U_vs_C, file.path(output_dir, "rds", "res_Untreated_vs_SG1C.rds"))
   saveRDS(res_B_vs_C, file.path(output_dir, "rds", "res_SG1B_vs_SG1C.rds"))
   
   saveRDS(dds, file.path(output_dir, "rds", "dds_object.rds"))
   
+  # VST normalized counts for heatmaps
   vst_counts <- assay(vst(dds, blind = TRUE))
   vst_df <- as.data.frame(vst_counts)
   vst_df$gene_id <- rownames(vst_counts)
@@ -53,6 +71,7 @@ run_de_analysis <- function(group_name, sample_cols, output_dir) {
   
   cat(sprintf("VST counts saved for heatmap generation\n"))
   
+  # Summary statistics
   sig1 <- subset(as.data.frame(res_U_vs_B), padj < 0.05 & abs(log2FoldChange) > 1)
   sig2 <- subset(as.data.frame(res_U_vs_C), padj < 0.05 & abs(log2FoldChange) > 1)
   sig3 <- subset(as.data.frame(res_B_vs_C), padj < 0.05 & abs(log2FoldChange) > 1)
@@ -62,28 +81,45 @@ run_de_analysis <- function(group_name, sample_cols, output_dir) {
   cat(sprintf("SG1B vs SG1C: %d significant genes\n", nrow(sig3)))
   cat(sprintf("Results saved to: %s/\n", output_dir))
   
+  # Clean up
+  rm(count_matrix, sig1, sig2, sig3)
+  gc()
+  
   return(invisible(NULL))
 }
 
+# Define Sample Columns -----------------------------------------------------------
+# GF 24h: 4 mice x 3 conditions x 3 replicates = 36 samples
 gf_24h_cols <- c("GF1_5_24_C1", "GF1_5_24_C2", "GF1_5_24_C3",
                   "GF2_5_24_A1", "GF2_5_24_A2", "GF2_5_24_A3",
                   "GF3_5_24_B1", "GF3_5_24_B2", "GF3_5_24_B3",
                   "GF4_5_24_C1", "GF4_5_24_C2", "GF4_5_24_C3")
 
+# GF 6h: 4 mice x 3 conditions x 3 replicates = 36 samples
 gf_6h_cols <- c("GF1_5_6h_C1", "GF1_5_6h_C2", "GF1_5_6h_C3",
                  "GF2_5_6h_A1", "GF2_5_6h_A2", "GF2_5_6h_A3",
                  "GF3_5_6h_B1", "GF3_5_6h_B2", "GF3_5_6h_B3",
                  "GF4_5_6h_C1", "GF4_5_6h_C2", "GF4_5_6h_C3")
 
+# SPF 24h: 2 mice x 3 conditions x 3 replicates = 18 samples
 spf_24h_cols <- c("SPF1_5_24_A1", "SPF1_5_24_A2", "SPF1_5_24_A3",
                    "SPF2_5_24_B1", "SPF2_5_24_B2", "SPF2_5_24_B3")
 
+# SPF 6h: 2 mice x 3 conditions x 3 replicates = 18 samples
 spf_6h_cols <- c("SPF1_5_6h_A1", "SPF1_5_6h_A2", "SPF1_5_6h_A3",
-                  "SPF2_5_6h_B1", "SPF2_5_6h_B2", "SPF2_5_6h_B3")
+                   "SPF2_5_6h_B1", "SPF2_5_6h_B2", "SPF2_5_6h_B3")
 
+# Run Analysis --------------------------------------------------------------------
 run_de_analysis("GF 24h", gf_24h_cols, "gf_24h")
 run_de_analysis("GF 6h", gf_6h_cols, "gf_6h")
 run_de_analysis("SPF 24h", spf_24h_cols, "spf_24h")
 run_de_analysis("SPF 6h", spf_6h_cols, "spf_6h")
 
 cat("\n=== All DE analyses complete! ===\n")
+
+# Save Session Info ---------------------------------------------------------------
+sink("session_info_01.txt")
+sessionInfo()
+sink()
+
+cat("Session info saved to session_info_01.txt\n")
