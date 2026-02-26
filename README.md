@@ -215,7 +215,3 @@ sink()
   - `pathway_go_<comparison>_DOWN.png` - Downregulated genes only
 - Only runs for comparisons with ≥3 significant genes in each direction
 - Each group folder has a `summary.txt` with statistics and file listing
-
----
-
-## R Script Best Practices
