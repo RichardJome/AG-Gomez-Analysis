@@ -33,11 +33,14 @@ D:\AG Gomez Analysis/
 
 ## R Code Standards
 - Use `<-` for assignment (not `=`)
-- Comment with `#` for section headers
+- Comment with `#` for section headers (e.g., `# Load Libraries -------------------------------------------------------------------`)
 - Variable names: lowercase with underscores (e.g., `result_df`)
 - Function names: lowercase with underscores (e.g., `read_count_data`)
 - Load packages explicitly with `library()` at script top
 - Use tidyverse style for dplyr operations
+- Add function documentation with `@param` and `@return` roxygen-style comments
+- Include session info at end of each script (`sessionInfo()` to `session_info_XX.txt`)
+- Clean up memory with `rm()` + `gc()` after large operations
 
 ## Project Overview
 - **Project**: Differential gene expression analysis of epidermal organoids

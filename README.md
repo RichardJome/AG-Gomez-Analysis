@@ -163,6 +163,47 @@ Rscript 07_pdf_report.R
 
 ---
 
+## R Script Best Practices
+
+All R scripts follow these conventions:
+
+- **Headers**: Script name, author, date, purpose
+- **Section dividers**: `# Section Name -------------------------------------------------------------------`
+- **Function docs**: `@param` and `@return` roxygen-style comments
+- **Memory cleanup**: `rm()` + `gc()` after large operations
+- **Session info**: Each script saves `session_info_XX.txt` for reproducibility
+
+Example:
+```r
+# 01_script_name.R ------------------------------------------------------------------------
+# Description of script
+# Author: Name
+# Date: 2025
+
+# Load Libraries -------------------------------------------------------------------
+library(dplyr)
+
+# Function: Do Something -----------------------------------------------------------
+#' Description of function
+#' @param input Description of input parameter
+#' @return Description of return value
+do_something <- function(input) {
+  # code
+  rm(obj)
+  gc()
+}
+
+# Main ----------------------------------------------------------------------------
+do_something()
+
+# Save Session Info ---------------------------------------------------------------
+sink("session_info_XX.txt")
+sessionInfo()
+sink()
+```
+
+---
+
 ## Pathway Analysis
 
 - Generates GO and KEGG enrichment plots for each comparison
