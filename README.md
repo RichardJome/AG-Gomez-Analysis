@@ -6,7 +6,7 @@ Differential gene expression analysis of epidermal organoids from mice treated w
 ## Author
 **Richard Jome**
 
-## Experiment: Experiment 5 (Omar)
+## Experiment: Experiment 5
 
 ### Mice
 - **Germ Free (GF)**: n=4 biological replicates
@@ -218,25 +218,4 @@ sink()
 
 ---
 
-## Sample Output
-
-### Volcano Plot (GF 24h - Untreated vs SG1C)
-
-![Volcano Plot](gf_24h/results/volcano_Untreated_vs_SG1C.png)
-
-*Volcano plot showing differential expression. Left = higher in Untreated, Right = higher in treatment. Colors indicate significance (grey → green → blue → red).*
-
----
-
-## Key Biological Findings
-
-### Barrier Genes (Downregulated by bacteria - LEFT side of volcano)
-- **Flg** (Filaggrin) - Skin barrier protein
-- **Dsg1a** (Desmoglein-1) - Epidermal adhesion
-- **Klk5** (Kallikrein 5) - Protease for skin desquamation
-- **Aqp5** (Aquaporin 5) - Water channel
-
-### Interpretation
-- Bacterial treatment downregulates skin barrier genes
-- Both commensal and pathogenic strains trigger barrier remodeling
-- Suggests skin is actively responding to bacterial colonization
+## R Script Best Practices
