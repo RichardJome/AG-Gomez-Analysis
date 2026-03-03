@@ -87,15 +87,32 @@ generate_heatmap <- function(source_group, contrast, top_n, genes, total_sig) {
   
   cat(sprintf("    Generating heatmap with %d genes\n", n_genes))
   
+  # Get genes that exist in ALL groups
+  genes_in_all <- genes
+  for (group_name in names(groups)) {
+    vst_subset <- all_vst[[group_name]] %>% filter(gene_name %in% genes)
+    genes_in_all <- intersect(genes_in_all, vst_subset$gene_name)
+  }
+  
+  if (length(genes_in_all) < 2) {
+    cat(sprintf("    Only %d genes in common across groups, skipping\n", length(genes_in_all)))
+    return(NULL)
+  }
+  
+  cat(sprintf("    Using %d genes common to all groups\n", length(genes_in_all)))
+  
   combined_matrix <- NULL
   col_names_all <- character()
   
   for (group_name in names(groups)) {
-    vst_subset <- all_vst[[group_name]] %>% filter(gene_name %in% genes)
+    vst_subset <- all_vst[[group_name]] %>% filter(gene_name %in% genes_in_all)
     
     if (nrow(vst_subset) == 0) {
       next
     }
+    
+    # Ensure same gene order
+    vst_subset <- vst_subset[match(genes_in_all, vst_subset$gene_name), ]
     
     sample_cols <- groups[[group_name]]$cols
     gene_names <- vst_subset$gene_name
@@ -121,7 +138,7 @@ generate_heatmap <- function(source_group, contrast, top_n, genes, total_sig) {
   if (n_genes == total_sig) {
     title_suffix <- sprintf("(%d genes)", total_sig)
   } else {
-    title_suffix <- sprintf("top %d of %d genes", n_genes, total_sig)
+    title_suffix <- sprintf("top %d of %d genes (%d common)", n_genes, total_sig, length(genes_in_all))
   }
   
   output_file <- sprintf("%s/results/heatmap_%s_top%d.png", source_group, contrast, n_genes)
@@ -165,7 +182,7 @@ for (group_name in names(groups)) {
     }
     
     sig_genes <- readRDS(res_file)
-    sig_genes <- subset(as.data.frame(sig_genes), padj < 0.05 & abs(log2FoldChange) > 1)
+    sig_genes <- subset(as.data.frame(sig_genes), padj < 0.2 & abs(log2FoldChange) > 0.5)
     sig_genes <- sig_genes[order(sig_genes$padj), ]
     
     n_sig <- nrow(sig_genes)
@@ -175,7 +192,7 @@ for (group_name in names(groups)) {
       next
     }
     
-    cat(sprintf("  %s: %d significant genes (padj<0.05, |log2FC|>1)\n", contrast, n_sig))
+    cat(sprintf("  %s: %d significant genes (padj<0.2, |log2FC|>0.5)\n", contrast, n_sig))
     
     if (n_sig >= 50) {
       top_genes_50 <- head(sig_genes$gene, 50)

@@ -122,7 +122,7 @@ run_pathway_analysis <- function(group_name, group_label) {
     res <- readRDS(res_file)
     res_df <- as.data.frame(res)
     
-    sig_all <- res_df[res_df$padj < 0.05 & !is.na(res_df$padj) & abs(res_df$log2FoldChange) >= 1, ]
+    sig_all <- res_df[res_df$padj < 0.2 & !is.na(res_df$padj) & abs(res_df$log2FoldChange) >= 0.5, ]
     
     sig_up <- sig_all[sig_all$log2FoldChange > 0, ]
     sig_down <- sig_all[sig_all$log2FoldChange < 0, ]

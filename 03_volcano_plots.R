@@ -35,15 +35,15 @@ create_volcano_plots <- function(group_name, input_dir, output_dir) {
   ylim3 <- c(0, ylim3_val)
   
   # Extract significant genes for labeling
-  sig_df1 <- df1[df1$padj < 0.05 & abs(df1$log2FoldChange) > 1 & !is.na(df1$gene) & !is.na(df1$padj) & !is.na(df1$log2FoldChange), ]
+  sig_df1 <- df1[df1$padj < 0.2 & abs(df1$log2FoldChange) > 0.5 & !is.na(df1$gene) & !is.na(df1$padj) & !is.na(df1$log2FoldChange), ]
   sig_df1 <- sig_df1[order(sig_df1$padj), ]
   sig_genes1 <- sig_df1$gene
   
-  sig_df2 <- df2[df2$padj < 0.05 & abs(df2$log2FoldChange) > 1 & !is.na(df2$gene) & !is.na(df2$padj) & !is.na(df2$log2FoldChange), ]
+  sig_df2 <- df2[df2$padj < 0.2 & abs(df2$log2FoldChange) > 0.5 & !is.na(df2$gene) & !is.na(df2$padj) & !is.na(df2$log2FoldChange), ]
   sig_df2 <- sig_df2[order(sig_df2$padj), ]
   sig_genes2 <- sig_df2$gene
   
-  sig_df3 <- df3[df3$padj < 0.05 & abs(df3$log2FoldChange) > 1 & !is.na(df3$gene) & !is.na(df3$padj) & !is.na(df3$log2FoldChange), ]
+  sig_df3 <- df3[df3$padj < 0.2 & abs(df3$log2FoldChange) > 0.5 & !is.na(df3$gene) & !is.na(df3$padj) & !is.na(df3$log2FoldChange), ]
   sig_df3 <- sig_df3[order(sig_df3$padj), ]
   sig_genes3 <- sig_df3$gene
   
