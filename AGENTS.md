@@ -20,10 +20,10 @@ D:\AG Gomez Analysis/
 ├── 04_heatmap.R           # Heatmap generator (genes across all groups)
 ├── 05_pathway_analysis.R  # Pathway enrichment (GO/KEGG - UP/DOWN separated)
 ├── 06_summary_files.R     # Generate summary.txt for each group
-├── 07_pdf_report.R        # Generate PDF report with all plots
-├── 08_wiki_pathways.R    # WikiPathways enrichment analysis
-├── 09_gene_histogram.R   # Gene distribution histogram (UP/DOWN/COMMON)
-├── AGENTS.md             # This file
+├── 08_wiki_pathways.R     # WikiPathways enrichment analysis
+├── 09_gene_histogram.R    # Gene distribution histogram (UP/DOWN/COMMON)
+├── 09_pdf_report.R        # Generate PDF report with all plots
+├── AGENTS.md              # This file
 ├── README.md              # Project documentation
 ├── gf_24h/               # GF 24h analysis results
 │   ├── rds/              # DESeq2 results and VST counts
@@ -133,9 +133,9 @@ gf_24h/
 - [x] 04_heatmap.R - Clustered heatmaps
 - [x] 05_pathway_analysis.R - GO/KEGG pathway enrichment
 - [x] 06_summary_files.R - Summary files
-- [x] 07_pdf_report.R - PDF report
 - [x] 08_wiki_pathways.R - WikiPathways analysis
 - [x] 09_gene_histogram.R - Gene distribution histograms
+- [x] 09_pdf_report.R - PDF report with all plots
 
 ## How to Run
 
@@ -158,14 +158,14 @@ Rscript 05_pathway_analysis.R
 # 6. Generate summary files
 Rscript 06_summary_files.R
 
-# 7. Generate PDF report
-Rscript 07_pdf_report.R
-
-# 8. WikiPathways analysis
+# 7. WikiPathways analysis
 Rscript 08_wiki_pathways.R
 
-# 9. Gene distribution histograms
+# 8. Gene distribution histograms
 Rscript 09_gene_histogram.R
+
+# 9. Generate PDF report
+Rscript 09_pdf_report.R
 ```
 
 ## Key Outputs

@@ -10,7 +10,19 @@ library(grid)
 library(ggplot2)
 library(ggVennDiagram)
 
+# Parameters ------------------------------------------------------------------------
+fdr_threshold <- 0.2
+log2fc_threshold <- 0.5
+
 # Define Groups (order for report) ------------------------------------------------
+groups_order <- list(
+  "gf_6h" = "Germ Free 6h",
+  "gf_24h" = "Germ Free 24h",
+  "spf_6h" = "SPF 6h",
+  "spf_24h" = "SPF 24h"
+)
+
+comparisons <- c("Untreated_vs_SG1B", "Untreated_vs_SG1C", "SG1B_vs_SG1C")
 groups_order <- list(
   "gf_6h" = "Germ Free 6h",
   "gf_24h" = "Germ Free 24h",
@@ -35,7 +47,7 @@ get_stats <- function(group_name) {
     res <- readRDS(res_file)
     res_df <- as.data.frame(res)
     
-    sig_all <- res_df[res_df$padj < 0.05 & !is.na(res_df$padj) & abs(res_df$log2FoldChange) >= 1, ]
+    sig_all <- res_df[res_df$padj < fdr_threshold & !is.na(res_df$padj) & abs(res_df$log2FoldChange) >= log2fc_threshold, ]
     sig_up <- sig_all[sig_all$log2FoldChange > 0, ]
     sig_down <- sig_all[sig_all$log2FoldChange < 0, ]
     
@@ -162,7 +174,7 @@ add_summary_page <- function() {
   }
   
   # Parameters note
-  grid.text("Parameters: padj < 0.05, |log2FC| > 1", y = 0.08, 
+  grid.text(sprintf("Parameters: padj < %.2f, |log2FC| > %.1f", fdr_threshold, log2fc_threshold), y = 0.08, 
             gp = gpar(fontsize = 10, col = "gray50"))
   
   # Page number
@@ -199,7 +211,7 @@ add_group_section <- function(group_name, group_label) {
     } else if (file.exists(res_file)) {
       res <- readRDS(res_file)
       res_df <- as.data.frame(res)
-      sig_count <- sum(res_df$padj < 0.05 & !is.na(res_df$padj) & abs(res_df$log2FoldChange) >= 1)
+      sig_count <- sum(res_df$padj < fdr_threshold & !is.na(res_df$padj) & abs(res_df$log2FoldChange) >= log2fc_threshold)
       
       page_counter <<- page_counter + 1
       grid.newpage()
@@ -213,11 +225,11 @@ add_group_section <- function(group_name, group_label) {
       with(res_df, plot(log2FoldChange, -log10(padj), 
                        main = title_str,
                        pch = 16, cex = 0.5,
-                       col = ifelse(padj < 0.05 & abs(log2FoldChange) >= 1, 
+                       col = ifelse(padj < fdr_threshold & abs(log2FoldChange) >= log2fc_threshold, 
                                     ifelse(log2FoldChange > 0, "red", "blue"), "gray80"),
                        xlab = "log2FoldChange", ylab = "-log10(padj)"))
-      abline(h = -log10(0.05), col = "gray40", lty = 2)
-      abline(v = c(-1, 1), col = "gray40", lty = 2)
+      abline(h = -log10(fdr_threshold), col = "gray40", lty = 2)
+      abline(v = c(-log2fc_threshold, log2fc_threshold), col = "gray40", lty = 2)
       
       grid.text(paste("Page", page_counter), y = 0.03, 
                 gp = gpar(fontsize = 10, col = "gray50"))
@@ -247,7 +259,7 @@ add_group_section <- function(group_name, group_label) {
     add_png_page(hfile, title_str)
   }
   
-  # Pathway plots
+  # Pathway plots (GO/KEGG)
   pathway_files <- list.files(results_dir, pattern = "pathway_.*\\.png$", full.names = TRUE)
   pathway_files <- sort(pathway_files)
   
@@ -255,8 +267,20 @@ add_group_section <- function(group_name, group_label) {
     fname <- basename(pfile)
     fname_clean <- gsub("pathway_", "", gsub("\\.png$", "", fname))
     fname_clean <- gsub("_", " ", fname_clean)
-    title_str <- paste(group_label, "-", fname_clean)
+    title_str <- paste(group_label, "- GO/KEGG:", fname_clean)
     add_png_page(pfile, title_str)
+  }
+  
+  # WikiPathways plots
+  wiki_files <- list.files(results_dir, pattern = "wiki_.*\\.png$", full.names = TRUE)
+  wiki_files <- sort(wiki_files)
+  
+  for (wfile in wiki_files) {
+    fname <- basename(wfile)
+    fname_clean <- gsub("wiki_", "", gsub("\\.png$", "", fname))
+    fname_clean <- gsub("_", " ", fname_clean)
+    title_str <- paste(group_label, "- WikiPathways:", fname_clean)
+    add_png_page(wfile, title_str)
   }
 }
 
@@ -270,6 +294,24 @@ add_summary_page()
 
 for (grp in names(groups_order)) {
   add_group_section(grp, groups_order[[grp]])
+}
+
+# Add histogram and summary plots at the end
+page_counter <<- page_counter + 1
+grid.newpage()
+grid.text("Gene Distribution Analysis", y = 0.97, 
+          gp = gpar(fontsize = 18, fontface = "bold"))
+
+# Gene distribution histogram
+hist_file <- "gene_distribution_histogram.png"
+if (file.exists(hist_file)) {
+  add_png_page(hist_file, "Gene Distribution: UP/DOWN/COMMON")
+}
+
+# Gene counts by group
+counts_file <- "gene_counts_by_group.png"
+if (file.exists(counts_file)) {
+  add_png_page(counts_file, "Gene Counts by Group and Comparison")
 }
 
 dev.off()
