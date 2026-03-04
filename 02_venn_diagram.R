@@ -22,9 +22,10 @@ create_venn <- function(group_name, input_dir, output_dir) {
   res2 <- readRDS(file.path(input_dir, "rds", "res_Untreated_vs_SG1C.rds"))
   res3 <- readRDS(file.path(input_dir, "rds", "res_SG1B_vs_SG1C.rds"))
   
-  sig1 <- subset(as.data.frame(res1), padj < 0.2 & abs(log2FoldChange) > 0.5)
-  sig2 <- subset(as.data.frame(res2), padj < 0.2 & abs(log2FoldChange) > 0.5)
-  sig3 <- subset(as.data.frame(res3), padj < 0.2 & abs(log2FoldChange) > 0.5)
+  # Standard thresholds: padj < 0.05, |log2FC| > 1.0
+  sig1 <- subset(as.data.frame(res1), padj < 0.05 & abs(log2FoldChange) > 1.0)
+  sig2 <- subset(as.data.frame(res2), padj < 0.05 & abs(log2FoldChange) > 1.0)
+  sig3 <- subset(as.data.frame(res3), padj < 0.05 & abs(log2FoldChange) > 1.0)
   
   genes_A <- sig1$gene[!is.na(sig1$gene)]
   genes_B <- sig2$gene[!is.na(sig2$gene)]

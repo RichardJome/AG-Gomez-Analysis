@@ -74,8 +74,11 @@ run_pathway_for_genes <- function(entrez_ids, title_base, results_dir, prefix, m
   
   if (!is.null(ego) && nrow(ego) > 0) {
     go_file <- file.path(results_dir, paste0("pathway_go_", prefix, ".png"))
-    png(go_file, width = 14, height = 10, units = "in", res = 300)
-    print(dotplot(ego, showCategory = 20) + ggtitle(paste("GO Enrichment -", title_base)))
+    png(go_file, width = 14, height = 12, units = "in", res = 300)
+    print(dotplot(ego, showCategory = 15, font.size = 10) + 
+            ggtitle(paste("GO Enrichment -", title_base)) +
+            theme(plot.title = element_text(size = 12, face = "bold"),
+                  axis.text.y = element_text(size = 9)))
     dev.off()
   }
   
@@ -89,8 +92,11 @@ run_pathway_for_genes <- function(entrez_ids, title_base, results_dir, prefix, m
   
   if (!is.null(ekegg) && nrow(ekegg) > 0) {
     kegg_file <- file.path(results_dir, paste0("pathway_kegg_", prefix, ".png"))
-    png(kegg_file, width = 14, height = 10, units = "in", res = 300)
-    print(dotplot(ekegg, showCategory = 20) + ggtitle(paste("KEGG Enrichment -", title_base)))
+    png(kegg_file, width = 14, height = 12, units = "in", res = 300)
+    print(dotplot(ekegg, showCategory = 15, font.size = 10) + 
+            ggtitle(paste("KEGG Enrichment -", title_base)) +
+            theme(plot.title = element_text(size = 12, face = "bold"),
+                  axis.text.y = element_text(size = 9)))
     dev.off()
   }
   
@@ -122,7 +128,8 @@ run_pathway_analysis <- function(group_name, group_label) {
     res <- readRDS(res_file)
     res_df <- as.data.frame(res)
     
-    sig_all <- res_df[res_df$padj < 0.2 & !is.na(res_df$padj) & abs(res_df$log2FoldChange) >= 0.5, ]
+    # Standard thresholds: padj < 0.05, |log2FC| > 1.0
+    sig_all <- res_df[res_df$padj < 0.05 & !is.na(res_df$padj) & abs(res_df$log2FoldChange) >= 1.0, ]
     
     sig_up <- sig_all[sig_all$log2FoldChange > 0, ]
     sig_down <- sig_all[sig_all$log2FoldChange < 0, ]

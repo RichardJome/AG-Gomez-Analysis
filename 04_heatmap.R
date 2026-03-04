@@ -182,7 +182,7 @@ for (group_name in names(groups)) {
     }
     
     sig_genes <- readRDS(res_file)
-    sig_genes <- subset(as.data.frame(sig_genes), padj < 0.2 & abs(log2FoldChange) > 0.5)
+    sig_genes <- subset(as.data.frame(sig_genes), padj < 0.05 & abs(log2FoldChange) > 1.0)
     sig_genes <- sig_genes[order(sig_genes$padj), ]
     
     n_sig <- nrow(sig_genes)
@@ -192,7 +192,7 @@ for (group_name in names(groups)) {
       next
     }
     
-    cat(sprintf("  %s: %d significant genes (padj<0.2, |log2FC|>0.5)\n", contrast, n_sig))
+    cat(sprintf("  %s: %d significant genes (padj<0.05, |log2FC|>1.0)\n", contrast, n_sig))
     
     if (n_sig >= 50) {
       top_genes_50 <- head(sig_genes$gene, 50)

@@ -80,8 +80,8 @@ Example: GF1_5_24_C1 = GF mouse 1, 24h, replicate C, condition 1 (Untreated)
 ## Statistical Parameters
 - **Tool**: DESeq2
 - **Design**: ~ condition
-- **padj cutoff**: 0.2 (-log10(padj) > 0.7)
-- **|log2FC| cutoff**: 0.5
+- **padj cutoff**: 0.05 (standard)
+- **|log2FC| cutoff**: 1.0 (standard 2-fold change)
 
 ## Analysis Groups (4 total)
 1. **gf_24h** - Germ Free mice, 24 hours
@@ -98,12 +98,16 @@ Example: GF1_5_24_C1 = GF mouse 1, 24h, replicate C, condition 1 (Untreated)
 
 | Group | Comparison | Significant | Up | Down |
 |-------|------------|-------------|-----|------|
-| GF 24h | U vs B | 4,211 | 1,896 | 2,315 |
-| GF 24h | U vs C | 5,135 | 2,749 | 2,386 |
-| GF 6h | U vs C | 3 | 3 | 0 |
-| SPF 24h | U vs B | 2,137 | 848 | 1,289 |
-| SPF 24h | U vs C | 1,446 | 567 | 879 |
+| GF 24h | U vs B | 1,331 | 681 | 650 |
+| GF 24h | U vs C | 1,777 | 992 | 785 |
+| GF 24h | SG1B vs SG1C | 0 | 0 | 0 |
+| GF 6h | All comparisons | 0 | 0 | 0 |
+| SPF 24h | U vs B | 491 | 122 | 369 |
+| SPF 24h | U vs C | 305 | 102 | 203 |
+| SPF 24h | SG1B vs SG1C | 0 | 0 | 0 |
 | SPF 6h | U vs B | 1 | 0 | 1 |
+| SPF 6h | U vs C | 0 | 0 | 0 |
+| SPF 6h | SG1B vs SG1C | 1 | 0 | 1 |
 
 ## Output Structure
 ```
@@ -175,6 +179,6 @@ Rscript 09_pdf_report.R
 - **gene_counts_by_group.png** - Bar chart of genes by group
 
 ## Notes
-- Sample mapping fixed: _1=Untreated, _2=SG1B, _3=SG1C
-- Threshold: padj<0.2 (was incorrectly using A/B/C mapping before)
-- GF 24h U vs C: 5,135 significant genes (close to BigOmics results)
+- Sample mapping: _1=Untreated, _2=SG1B, _3=SG1C
+- **Standard thresholds**: padj < 0.05, |log2FC| > 1 (updated from lenient thresholds)
+- Upregulated and downregulated genes are analyzed separately in pathway enrichment

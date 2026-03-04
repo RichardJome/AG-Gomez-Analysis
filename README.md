@@ -103,31 +103,31 @@ For each group, three DESeq2 contrasts:
 
 ## Results Summary
 
-### Total Significant Genes (padj < 0.05, |log2FC| > 1)
+### Total Significant Genes (padj < 0.05, |log2FC| > 1 - STANDARD THRESHOLDS)
 
 | Group | U vs SG1B | U vs SG1C | SG1B vs SG1C |
 |-------|------------|------------|---------------|
-| GF 24h | 19 | 50 | 10 |
-| GF 6h | 6 | 1 | 0 |
-| SPF 24h | 0 | 165 | 0 |
-| SPF 6h | 22 | 152 | 2 |
+| GF 24h | 1,331 | 1,777 | 0 |
+| GF 6h | 0 | 0 | 0 |
+| SPF 24h | 491 | 305 | 0 |
+| SPF 6h | 1 | 0 | 1 |
 
 ### Upregulated / Downregulated Breakdown
 
 | Group | Comparison | Significant | Upregulated | Downregulated |
 |-------|------------|-------------|-------------|----------------|
-| GF 24h | U vs SG1B | 19 | 8 | 11 |
-| GF 24h | U vs SG1C | 50 | 22 | 28 |
-| GF 24h | SG1B vs SG1C | 10 | 0 | 10 |
-| GF 6h | U vs SG1B | 6 | 3 | 3 |
-| GF 6h | U vs SG1C | 1 | 1 | 0 |
+| GF 24h | U vs SG1B | 1,331 | 681 | 650 |
+| GF 24h | U vs SG1C | 1,777 | 992 | 785 |
+| GF 24h | SG1B vs SG1C | 0 | 0 | 0 |
+| GF 6h | U vs SG1B | 0 | 0 | 0 |
+| GF 6h | U vs SG1C | 0 | 0 | 0 |
 | GF 6h | SG1B vs SG1C | 0 | 0 | 0 |
-| SPF 24h | U vs SG1B | 0 | 0 | 0 |
-| SPF 24h | U vs SG1C | 165 | 102 | 63 |
+| SPF 24h | U vs SG1B | 491 | 122 | 369 |
+| SPF 24h | U vs SG1C | 305 | 102 | 203 |
 | SPF 24h | SG1B vs SG1C | 0 | 0 | 0 |
-| SPF 6h | U vs SG1B | 22 | 22 | 0 |
-| SPF 6h | U vs SG1C | 152 | 142 | 10 |
-| SPF 6h | SG1B vs SG1C | 2 | 0 | 2 |
+| SPF 6h | U vs SG1B | 1 | 0 | 1 |
+| SPF 6h | U vs SG1C | 0 | 0 | 0 |
+| SPF 6h | SG1B vs SG1C | 1 | 0 | 1 |
 
 ---
 

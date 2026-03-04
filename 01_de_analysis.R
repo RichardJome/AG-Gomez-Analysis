@@ -4,7 +4,7 @@
 #   _1 = Untreated
 #   _2 = SG1B (commensal-like)
 #   _3 = SG1C (pathogenic-like)
-# Filter: -log10(padj) > 0.7 (padj < 0.2), |log2FC| > 0.5
+# Filter: padj < 0.05, |log2FC| > 1 (standard thresholds)
 
 library(DESeq2)
 library(dplyr)
@@ -16,13 +16,13 @@ df <- read_excel("Experiment_5.xlsx")
 
 # Parameters ------------------------------------------------------------------------
 params <- list(
-  fdr_threshold = 0.2,        # -log10(padj) > 0.7 = padj < 0.2
-  log2fc_threshold = 0.5      # |log2FC| > 0.5
+  fdr_threshold = 0.05,       # padj < 0.05 (standard)
+  log2fc_threshold = 1.0      # |log2FC| > 1 (2-fold change, standard)
 )
 
 cat("=== DE Analysis Parameters ===\n")
-cat(sprintf("FDR threshold: %.2f (-log10(padj) > 0.7)\n", params$fdr_threshold))
-cat(sprintf("|log2FC| threshold: %.1f\n", params$log2fc_threshold))
+cat(sprintf("FDR threshold: %.2f (padj < 0.05, standard)\n", params$fdr_threshold))
+cat(sprintf("|log2FC| threshold: %.1f (|log2FC| > 1, standard 2-fold change)\n", params$log2fc_threshold))
 cat("\n")
 
 # Function to get sample columns for a group ---------------------------------------

@@ -7,9 +7,9 @@ library(org.Mm.eg.db)
 library(dplyr)
 library(ggplot2)
 
-# Parameters ------------------------------------------------------------------------
-fdr_threshold <- 0.2
-log2fc_threshold <- 0.5
+# Parameters (standard thresholds)
+fdr_threshold <- 0.05   # padj < 0.05 (standard)
+log2fc_threshold <- 1.0  # |log2FC| > 1.0 (standard 2-fold change)
 
 # Define groups
 groups <- list(
@@ -70,8 +70,11 @@ run_wiki_pathway_analysis <- function(group_name, group_label) {
           wp_result <- enrichWP(entrez_up, organism = "Mus musculus", pvalueCutoff = 0.05)
           if (!is.null(wp_result) && nrow(wp_result) > 0) {
             wp_result@result$Description <- substr(wp_result@result$Description, 1, 50)
-            p <- dotplot(wp_result, showCategory = 15, title = paste(title_base, "(UP) - WikiPathways"))
-            ggsave(file.path(results_dir, paste0("wiki_", comp, "_UP.png")), p, width = 10, height = 8, dpi = 300)
+            p <- dotplot(wp_result, showCategory = 12, font.size = 10) + 
+              ggtitle(paste(title_base, "(UP) - WikiPathways")) +
+              theme(plot.title = element_text(size = 11, face = "bold"),
+                    axis.text.y = element_text(size = 9))
+            ggsave(file.path(results_dir, paste0("wiki_", comp, "_UP.png")), p, width = 12, height = 10, dpi = 300)
             cat(sprintf("    Saved: wiki_%s_UP.png\n", comp))
           }
         }, error = function(e) {
@@ -90,8 +93,11 @@ run_wiki_pathway_analysis <- function(group_name, group_label) {
           wp_result <- enrichWP(entrez_down, organism = "Mus musculus", pvalueCutoff = 0.05)
           if (!is.null(wp_result) && nrow(wp_result) > 0) {
             wp_result@result$Description <- substr(wp_result@result$Description, 1, 50)
-            p <- dotplot(wp_result, showCategory = 15, title = paste(title_base, "(DOWN) - WikiPathways"))
-            ggsave(file.path(results_dir, paste0("wiki_", comp, "_DOWN.png")), p, width = 10, height = 8, dpi = 300)
+            p <- dotplot(wp_result, showCategory = 12, font.size = 10) + 
+              ggtitle(paste(title_base, "(DOWN) - WikiPathways")) +
+              theme(plot.title = element_text(size = 11, face = "bold"),
+                    axis.text.y = element_text(size = 9))
+            ggsave(file.path(results_dir, paste0("wiki_", comp, "_DOWN.png")), p, width = 12, height = 10, dpi = 300)
             cat(sprintf("    Saved: wiki_%s_DOWN.png\n", comp))
           }
         }, error = function(e) {

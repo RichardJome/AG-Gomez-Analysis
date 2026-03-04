@@ -5,9 +5,9 @@
 library(dplyr)
 library(ggplot2)
 
-# Parameters ------------------------------------------------------------------------
-fdr_threshold <- 0.2
-log2fc_threshold <- 0.5
+# Parameters (standard thresholds)
+fdr_threshold <- 0.05   # padj < 0.05 (standard)
+log2fc_threshold <- 1.0  # |log2FC| > 1.0 (standard 2-fold change)
 
 # Function to get significant genes -------------------------------------------------
 get_sig_genes <- function(group_name, comparison, direction = "all") {
